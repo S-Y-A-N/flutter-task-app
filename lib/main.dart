@@ -1,18 +1,27 @@
+import 'dart:io';
 
 import 'package:assign2/theme/theme.dart';
 import 'package:assign2/theme/theme_provider.dart';
 import 'package:assign2/task.dart';
 import 'package:assign2/pages/new_task.dart';
 import 'package:assign2/pages/my_tasks.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/completed_tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isDarkMode =
+      prefs.getBool('isDarkMode') ?? ThemeMode.system == ThemeMode.dark;
+
   await loadTasks();
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+      create: (context) => ThemeProvider(isDarkMode),
       child: const MyApp(),
     ),
   );

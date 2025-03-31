@@ -31,17 +31,18 @@ class _TaskListViewState extends State<TaskListView> {
     }
 
     return ListView.builder(
+      shrinkWrap: true,
       itemCount: taskList.length,
+
       itemBuilder: (context, i) {
         Task task = taskList[i];
 
         return ListTile(
+          title: Text(task.title),
           trailing: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [progressDropDown(task), actionDropDown(task)],
           ),
-          titleAlignment: ListTileTitleAlignment.top,
-          title: Text(task.title),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -51,6 +52,7 @@ class _TaskListViewState extends State<TaskListView> {
               SizedBox(height: 20),
             ],
           ),
+          titleAlignment: ListTileTitleAlignment.top,
           titleTextStyle: Theme.of(context).textTheme.titleSmall,
           subtitleTextStyle: Theme.of(context).textTheme.bodyLarge,
         );
@@ -177,11 +179,7 @@ class _TaskListViewState extends State<TaskListView> {
                                 ),
                               ],
                             ),
-                            TaskForm(
-                              formType: FormType.update,
-                              task: task,
-                              setState: setState,
-                            ),
+                            TaskForm(formType: FormType.update, task: task),
                           ],
                         ),
                       ),
@@ -195,11 +193,48 @@ class _TaskListViewState extends State<TaskListView> {
         MenuItemButton(
           leadingIcon: Icon(Icons.delete),
           child: Text('Delete'),
-          onPressed:
-              () => setState(() {
-                deleteTask(task.id);
-                Task.taskList.remove(task);
-              }),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Delete Task'),
+                  content: Text(
+                    'Are you sure you want to delete "${task.title}"?',
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '"${task.title}" deleted successfully',
+                            ),
+                          ),
+                        );
+
+                        setState(() {
+                          deleteTask(task.id);
+                          Task.taskList.remove(task);
+                        });
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      ),
+                      child: Text('Delete'),
+                    ),
+                  ],
+                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                );
+              },
+            );
+          },
         ),
       ],
       builder: (context, controller, child) {

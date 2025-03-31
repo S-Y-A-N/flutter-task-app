@@ -73,6 +73,7 @@ Future<void> saveTask(Task task) async {
 Future<void> loadTasks() async {
   final prefs = await SharedPreferences.getInstance();
   final keys = prefs.getKeys();
+  keys.remove('isDarkMode');
   final prefsMap = <String, dynamic>{};
 
   for (String key in keys) {

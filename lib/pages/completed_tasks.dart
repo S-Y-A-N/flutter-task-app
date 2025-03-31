@@ -1,5 +1,6 @@
 // Task Management Page
 import 'package:assign2/task_list_view.dart';
+import 'package:assign2/utils.dart';
 import 'package:flutter/material.dart';
 import '../task.dart';
 
@@ -13,18 +14,57 @@ class CompleteTasksPage extends StatefulWidget {
 class _CompleteTasksPageState extends State<CompleteTasksPage> {
   @override
   Widget build(BuildContext context) {
-    if (Task.taskList.isEmpty) {
-      return Center(child: Text('No tasks yet'));
+    List<Task> completeTasks = [];
+
+    if (Task.taskList.isNotEmpty) {
+      completeTasks =
+          Task.taskList
+              .where((task) => task.progress == Progress.completed)
+              .toList();
     }
 
-    var completeTasks =
-        Task.taskList
-            .where((task) => task.progress == Progress.completed)
-            .toList();
-    if (completeTasks.isEmpty) {
-      return Center(child: Text('No complete tasks yet'));
+    if (Task.taskList.isEmpty || completeTasks.isEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          loadImage('assets/no_tasks.png'),
+          Center(
+            child: Text(
+              'No completed tasks yet',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      );
     }
 
-    return TaskListView(progress: Progress.completed);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 20,
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Keep Going!',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                Text(
+                  'So far, you have completed ${completeTasks.length} ${completeTasks.length == 1 ? 'task' : 'tasks'}.',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ),
+        TaskListView(progress: Progress.completed),
+      ],
+    );
   }
 }

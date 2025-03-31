@@ -8,8 +8,7 @@ enum FormType { create, update }
 class TaskForm extends StatefulWidget {
   final FormType formType;
   final Task? task;
-  final setState;
-  const TaskForm({super.key, required this.formType, this.task, this.setState});
+  const TaskForm({super.key, required this.formType, this.task});
 
   @override
   State<TaskForm> createState() => _TaskFormState();
@@ -28,8 +27,14 @@ class _TaskFormState extends State<TaskForm> {
     if (widget.task != null && widget.formType == FormType.update) {
       taskTitle.text = widget.task!.title;
       taskDesc.text = widget.task!.desc;
-      taskDuration.text = timeString(widget.task!.duration!);
-      taskDueDate.text = dateString(widget.task!.dueDate!);
+      taskDuration.text =
+          taskDuration.text == "00:00"
+              ? ""
+              : timeString(widget.task!.duration!);
+      taskDueDate.text =
+          taskDueDate.text == "1970-01-01"
+              ? ""
+              : dateString(widget.task!.dueDate!);
       taskProgress = widget.task!.progress;
     }
     return Column(
@@ -45,9 +50,11 @@ class _TaskFormState extends State<TaskForm> {
             errorText: errorText,
           ),
           onChanged: (value) {
-            setState(() {
-              errorText = null;
-            });
+            if (errorText != null) {
+              setState(() {
+                errorText = null;
+              });
+            }
           },
         ),
         TextField(
@@ -110,28 +117,34 @@ class _TaskFormState extends State<TaskForm> {
             });
           },
         ),
-        Wrap(
-          spacing: 1,
-          runSpacing: 1,
-          children: [
-            customRadioButton(
-              "Not Started",
-              Progress.notStarted.icon,
-              Progress.notStarted,
-            ),
-            customRadioButton(
-              "In Progress",
-              Progress.inProgress.icon,
-              Progress.inProgress,
-            ),
-            customRadioButton(
-              "Completed",
-              Progress.completed.icon,
-              Progress.completed,
-            ),
-          ],
-        ),
+        if (widget.formType == FormType.create)
+          Wrap(
+            spacing: 1,
+            runSpacing: 1,
+            children: [
+              customRadioButton(
+                "Not Started",
+                Progress.notStarted.icon,
+                Progress.notStarted,
+              ),
+              customRadioButton(
+                "In Progress",
+                Progress.inProgress.icon,
+                Progress.inProgress,
+              ),
+              customRadioButton(
+                "Completed",
+                Progress.completed.icon,
+                Progress.completed,
+              ),
+            ],
+          ),
+        SizedBox(height: 15),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          ),
           onPressed: () async {
             if (taskTitle.text.isNotEmpty) {
               // initialize safe types for duration & dueDate
