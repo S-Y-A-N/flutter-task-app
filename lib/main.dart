@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -826,13 +827,15 @@ class _TaskFormState extends State<TaskForm> {
 double maxWidth = 1000;
 
 Widget loadImage(String path) {
-  bool imageExists = File(path).existsSync();
+  if (!kIsWeb) {
+    bool imageExists = File(path).existsSync();
 
-  if (imageExists) {
-    return Image.asset(path);
-  } else {
-    return SizedBox.shrink();
+    if (imageExists) {
+      return Image.asset(path);
+    }
   }
+
+  return SizedBox.shrink();
 }
 
 /// Task Logic
@@ -983,7 +986,7 @@ class ThemeProvider with ChangeNotifier {
   }
 }
 
-/// Theme Data 
+/// Theme Data
 ThemeData lightMode = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.deepPurple,
