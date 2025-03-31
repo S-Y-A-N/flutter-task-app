@@ -41,30 +41,35 @@ class _MyTasksPageState extends State<MyTasksPage> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 20,
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'You can do it!',
-                  style: Theme.of(context).textTheme.titleSmall,
+    return Center(
+      child: SizedBox(
+        width: maxWidth,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 20,
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'You can do it!',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Text(
+                      "Only ${incompleteTasks.length} ${incompleteTasks.length == 1 ? 'task' : 'tasks'} left, don't be lazy!",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
                 ),
-                Text(
-                  "Only ${incompleteTasks.length} ${incompleteTasks.length == 1 ? 'task' : 'tasks'} left, don't be lazy!",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
+              ),
             ),
-          ),
+            TaskListView(progress: Progress.notStarted),
+          ],
         ),
-        TaskListView(progress: Progress.notStarted),
-      ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:assign2/task_form.dart';
+import 'package:assign2/utils.dart';
 import 'package:flutter/material.dart';
 import 'task.dart';
 
@@ -158,31 +159,36 @@ class _TaskListViewState extends State<TaskListView> {
                 return StatefulBuilder(
                   builder: (context, setState) {
                     return Center(
-                      child: Dialog(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: 15,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Update Task',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  IconButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    icon: Icon(Icons.close),
-                                  ),
-                                ],
-                              ),
-                              TaskForm(formType: FormType.update, task: task),
-                            ],
+                      child: SizedBox(
+                        width: maxWidth,
+                        child: Dialog(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 15,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Update Task',
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.titleSmall,
+                                    ),
+                                    IconButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      icon: Icon(Icons.close),
+                                    ),
+                                  ],
+                                ),
+                                TaskForm(formType: FormType.update, task: task),
+                              ],
+                            ),
                           ),
                         ),
                       ),

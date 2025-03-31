@@ -41,30 +41,35 @@ class _CompleteTasksPageState extends State<CompleteTasksPage> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 20,
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Keep up the good work!',
-                  style: Theme.of(context).textTheme.titleSmall,
+    return Center(
+      child: SizedBox(
+        width: maxWidth,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 20,
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Keep up the good work!',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Text(
+                      'So far, you have completed ${completeTasks.length} ${completeTasks.length == 1 ? 'task' : 'tasks'}.',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
                 ),
-                Text(
-                  'So far, you have completed ${completeTasks.length} ${completeTasks.length == 1 ? 'task' : 'tasks'}.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
+              ),
             ),
-          ),
+            TaskListView(progress: Progress.completed),
+          ],
         ),
-        TaskListView(progress: Progress.completed),
-      ],
+      ),
     );
   }
 }
