@@ -157,30 +157,33 @@ class _TaskListViewState extends State<TaskListView> {
               builder: (BuildContext context) {
                 return StatefulBuilder(
                   builder: (context, setState) {
-                    return Dialog(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          spacing: 15,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Update Task',
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                                IconButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  icon: Icon(Icons.close),
-                                ),
-                              ],
-                            ),
-                            TaskForm(formType: FormType.update, task: task),
-                          ],
+                    return Center(
+                      child: Dialog(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 15,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Update Task',
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    icon: Icon(Icons.close),
+                                  ),
+                                ],
+                              ),
+                              TaskForm(formType: FormType.update, task: task),
+                            ],
+                          ),
                         ),
                       ),
                     );

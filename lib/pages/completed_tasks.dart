@@ -52,7 +52,7 @@ class _CompleteTasksPageState extends State<CompleteTasksPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Keep Going!',
+                  'Keep up the good work!',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Text(
