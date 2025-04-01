@@ -1,8 +1,0 @@
-# Ignore everything
-*
-/build/web/
-
-# Except
-!/.gitignore
-!/build/web/*
-!*/
