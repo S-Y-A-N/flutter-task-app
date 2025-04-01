@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:io';
 
-// I used the uuid package, to install run in terminal:
-// flutter pub add uuid
+// Please run this command to install the required packages:
+// flutter pub add uuid provider shared_preferences
 import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -127,9 +127,13 @@ class NewTaskPage extends StatefulWidget {
 }
 
 class _NewTaskPageState extends State<NewTaskPage> {
+  refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TaskForm(formType: FormType.create);
+    return TaskForm(formType: FormType.create, notifyParent: refresh);
   }
 }
 
@@ -142,6 +146,10 @@ class MyTasksPage extends StatefulWidget {
 }
 
 class _MyTasksPageState extends State<MyTasksPage> {
+  refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> incompleteTasks = [];
@@ -196,7 +204,7 @@ class _MyTasksPageState extends State<MyTasksPage> {
                 ),
               ),
             ),
-            TaskListView(progress: Progress.notStarted),
+            TaskListView(progress: Progress.notStarted, notifyParent: refresh),
           ],
         ),
       ),
@@ -213,6 +221,10 @@ class CompleteTasksPage extends StatefulWidget {
 }
 
 class _CompleteTasksPageState extends State<CompleteTasksPage> {
+  refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> completeTasks = [];
@@ -267,7 +279,7 @@ class _CompleteTasksPageState extends State<CompleteTasksPage> {
                 ),
               ),
             ),
-            TaskListView(progress: Progress.completed),
+            TaskListView(progress: Progress.completed, notifyParent: refresh),
           ],
         ),
       ),
@@ -278,7 +290,13 @@ class _CompleteTasksPageState extends State<CompleteTasksPage> {
 /// Task List Builder
 class TaskListView extends StatefulWidget {
   final Progress progress;
-  const TaskListView({super.key, required this.progress});
+  final Function() notifyParent;
+
+  const TaskListView({
+    super.key,
+    required this.progress,
+    required this.notifyParent,
+  });
 
   @override
   State<TaskListView> createState() => _TaskListViewState();
@@ -379,6 +397,7 @@ class _TaskListViewState extends State<TaskListView> {
               () => setState(() {
                 task.progress = Progress.notStarted;
                 updateTask(task.id);
+                widget.notifyParent();
               }),
         ),
         MenuItemButton(
@@ -388,6 +407,7 @@ class _TaskListViewState extends State<TaskListView> {
               () => setState(() {
                 task.progress = Progress.inProgress;
                 updateTask(task.id);
+                widget.notifyParent();
               }),
         ),
         MenuItemButton(
@@ -397,6 +417,7 @@ class _TaskListViewState extends State<TaskListView> {
               () => setState(() {
                 task.progress = Progress.completed;
                 updateTask(task.id);
+                widget.notifyParent();
               }),
         ),
       ],
@@ -459,7 +480,11 @@ class _TaskListViewState extends State<TaskListView> {
                                     ),
                                   ],
                                 ),
-                                TaskForm(formType: FormType.update, task: task),
+                                TaskForm(
+                                  formType: FormType.update,
+                                  task: task,
+                                  notifyParent: widget.notifyParent,
+                                ),
                               ],
                             ),
                           ),
@@ -500,10 +525,12 @@ class _TaskListViewState extends State<TaskListView> {
                         );
 
                         setState(() {
-                          deleteTask(task.id);
                           Task.taskList.remove(task);
+                          deleteTask(task.id);
                         });
+
                         Navigator.pop(context);
+                        widget.notifyParent();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.error,
@@ -541,7 +568,14 @@ enum FormType { create, update }
 class TaskForm extends StatefulWidget {
   final FormType formType;
   final Task? task;
-  const TaskForm({super.key, required this.formType, this.task});
+  final Function() notifyParent;
+
+  const TaskForm({
+    super.key,
+    required this.formType,
+    this.task,
+    required this.notifyParent,
+  });
 
   @override
   State<TaskForm> createState() => _TaskFormState();
@@ -708,8 +742,10 @@ class _TaskFormState extends State<TaskForm> {
                         progress: taskProgress,
                       );
 
-                      Task.taskList.add(task);
-                      await saveTask(task);
+                      setState(() {
+                        Task.taskList.add(task);
+                        saveTask(task);
+                      });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -730,7 +766,9 @@ class _TaskFormState extends State<TaskForm> {
                       widget.task!.dueDate = DateTime.parse(taskDueDate.text);
                       widget.task!.progress = taskProgress;
 
-                      await updateTask(widget.task!.id);
+                      setState(() {
+                        updateTask(widget.task!.id);
+                      });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -742,6 +780,7 @@ class _TaskFormState extends State<TaskForm> {
 
                       clearFields();
                       Navigator.pop(context);
+                      widget.notifyParent();
                       break;
                   }
                 } else if (taskTitle.text.isEmpty) {
@@ -824,9 +863,12 @@ class _TaskFormState extends State<TaskForm> {
 }
 
 /// Utils
-double maxWidth = 1000;
+const double maxWidth = 1000;
+
+bool mustRefresh = false;
 
 Widget loadImage(String path) {
+  // if not web (because dart:io doesn't work in web)
   if (!kIsWeb) {
     bool imageExists = File(path).existsSync();
 
