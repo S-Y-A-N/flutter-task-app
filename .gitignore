@@ -2,6 +2,6 @@
 *
 
 # Except
-!.gitignore
+!/.gitignore
 !/build/web/*
 !*/
