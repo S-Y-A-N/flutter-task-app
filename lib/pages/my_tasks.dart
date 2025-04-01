@@ -12,6 +12,10 @@ class MyTasksPage extends StatefulWidget {
 }
 
 class _MyTasksPageState extends State<MyTasksPage> {
+    refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> incompleteTasks = [];
@@ -66,7 +70,7 @@ class _MyTasksPageState extends State<MyTasksPage> {
                 ),
               ),
             ),
-            TaskListView(progress: Progress.notStarted),
+            TaskListView(progress: Progress.notStarted, notifyParent: refresh,),
           ],
         ),
       ),

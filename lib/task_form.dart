@@ -8,7 +8,13 @@ enum FormType { create, update }
 class TaskForm extends StatefulWidget {
   final FormType formType;
   final Task? task;
-  const TaskForm({super.key, required this.formType, this.task});
+  final Function() notifyParent;
+  const TaskForm({
+    super.key,
+    required this.formType,
+    this.task,
+    required this.notifyParent,
+  });
 
   @override
   State<TaskForm> createState() => _TaskFormState();
@@ -175,8 +181,10 @@ class _TaskFormState extends State<TaskForm> {
                         progress: taskProgress,
                       );
 
-                      Task.taskList.add(task);
-                      await saveTask(task);
+                      setState(() {
+                        Task.taskList.add(task);
+                        saveTask(task);
+                      });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -197,7 +205,9 @@ class _TaskFormState extends State<TaskForm> {
                       widget.task!.dueDate = DateTime.parse(taskDueDate.text);
                       widget.task!.progress = taskProgress;
 
-                      await updateTask(widget.task!.id);
+                      setState(() {
+                        updateTask(widget.task!.id);
+                      });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -216,6 +226,7 @@ class _TaskFormState extends State<TaskForm> {
                 }
 
                 setState(() {});
+                widget.notifyParent();
               },
               child:
                   widget.formType == FormType.create

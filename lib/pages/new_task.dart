@@ -10,8 +10,12 @@ class NewTaskPage extends StatefulWidget {
 }
 
 class _NewTaskPageState extends State<NewTaskPage> {
+  refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TaskForm(formType: FormType.create);
+    return TaskForm(formType: FormType.create, notifyParent: refresh);
   }
 }

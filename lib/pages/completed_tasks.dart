@@ -12,6 +12,10 @@ class CompleteTasksPage extends StatefulWidget {
 }
 
 class _CompleteTasksPageState extends State<CompleteTasksPage> {
+    refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> completeTasks = [];
@@ -66,7 +70,7 @@ class _CompleteTasksPageState extends State<CompleteTasksPage> {
                 ),
               ),
             ),
-            TaskListView(progress: Progress.completed),
+            TaskListView(progress: Progress.completed, notifyParent: refresh,),
           ],
         ),
       ),

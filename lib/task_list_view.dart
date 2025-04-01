@@ -5,7 +5,12 @@ import 'task.dart';
 
 class TaskListView extends StatefulWidget {
   final Progress progress;
-  const TaskListView({super.key, required this.progress});
+  final Function() notifyParent;
+  const TaskListView({
+    super.key,
+    required this.progress,
+    required this.notifyParent,
+  });
 
   @override
   State<TaskListView> createState() => _TaskListViewState();
@@ -102,29 +107,17 @@ class _TaskListViewState extends State<TaskListView> {
         MenuItemButton(
           leadingIcon: Icon(Progress.notStarted.icon),
           child: Text(Progress.notStarted.label),
-          onPressed:
-              () => setState(() {
-                task.progress = Progress.notStarted;
-                updateTask(task.id);
-              }),
+          onPressed: () => updateTaskProgress(task, Progress.notStarted),
         ),
         MenuItemButton(
           leadingIcon: Icon(Progress.inProgress.icon),
           child: Text(Progress.inProgress.label),
-          onPressed:
-              () => setState(() {
-                task.progress = Progress.inProgress;
-                updateTask(task.id);
-              }),
+          onPressed: () => updateTaskProgress(task, Progress.inProgress),
         ),
         MenuItemButton(
           leadingIcon: Icon(Progress.completed.icon),
           child: Text(Progress.completed.label),
-          onPressed:
-              () => setState(() {
-                task.progress = Progress.completed;
-                updateTask(task.id);
-              }),
+          onPressed: () => updateTaskProgress(task, Progress.completed),
         ),
       ],
       builder: (context, controller, child) {
@@ -146,6 +139,14 @@ class _TaskListViewState extends State<TaskListView> {
     );
   }
 
+  updateTaskProgress(task, taskProgress) {
+    setState(() {
+      task.progress = taskProgress;
+      updateTask(task.id);
+      widget.notifyParent();
+    });
+  }
+
   Widget actionDropDown(Task task) {
     return MenuAnchor(
       menuChildren: [
@@ -156,44 +157,40 @@ class _TaskListViewState extends State<TaskListView> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    return Center(
-                      child: SizedBox(
-                        width: maxWidth,
-                        child: Dialog(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 15,
+                return Center(
+                  child: SizedBox(
+                    width: maxWidth,
+                    child: Dialog(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 15,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Update Task',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleSmall,
-                                    ),
-                                    IconButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      icon: Icon(Icons.close),
-                                    ),
-                                  ],
+                                Text(
+                                  'Update Task',
+                                  style: Theme.of(context).textTheme.titleSmall,
                                 ),
-                                TaskForm(formType: FormType.update, task: task),
+                                IconButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  icon: Icon(Icons.close),
+                                ),
                               ],
                             ),
-                          ),
+                            TaskForm(
+                              formType: FormType.update,
+                              task: task,
+                              notifyParent: widget.notifyParent,
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 );
               },
             );
@@ -230,7 +227,9 @@ class _TaskListViewState extends State<TaskListView> {
                           deleteTask(task.id);
                           Task.taskList.remove(task);
                         });
+
                         Navigator.pop(context);
+                        widget.notifyParent();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.error,
